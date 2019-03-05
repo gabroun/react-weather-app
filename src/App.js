@@ -10,6 +10,7 @@ import Details from "./components/Details";
 import Header from "./components/Header";
 
 import background from "./images/background.jpg";
+import BarChart from "./components/BarChart";
 
 const GlobalStyle = createGlobalStyle`
 body {
@@ -50,6 +51,7 @@ class App extends React.Component {
                       });
                     }}
                   />
+                  <Home />
                 </PageWrapper>
               );
             }}

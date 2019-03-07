@@ -3,6 +3,7 @@ import queryString from "query-string";
 import { getForecast } from "../utils/api";
 import Day from "./Day";
 import styled from "styled-components";
+import BarChart from "./BarChart";
 
 const DaysContainer = styled.div`
   display: grid;
@@ -77,6 +78,7 @@ class Forecast extends React.Component {
             );
           })}
         </DaysContainer>
+        <BarChart data={this.state.forecastData} />
       </React.Fragment>
     );
   }

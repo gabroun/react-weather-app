@@ -23,6 +23,11 @@ const monthsMap = {
   "11": "Dec"
 };
 
+export function convertTemp(celsius) {
+  const fahrenheit = (celsius * 9) / 5 + 32;
+  return fahrenheit;
+}
+
 export function getDate(unitTimestamp) {
   const date = new Date(unitTimestamp * 1000);
   const day = daysMap[date.getDay()];

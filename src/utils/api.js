@@ -1,6 +1,7 @@
 import axios from "axios";
 
 const openWeatherKey = "bf41eed7776d7c7082c8493f2a5871bf";
+// const openWeatherKey = "0ab7e7df216fa41ab13de079149ea4c5";
 const baseURL = "https://api.openweathermap.org/data/2.5/";
 
 function prepRouteParams(queryStringData) {

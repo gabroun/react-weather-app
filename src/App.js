@@ -3,14 +3,12 @@ import { render } from "react-dom";
 import styled, { createGlobalStyle } from "styled-components";
 import { Route, BrowserRouter as Router } from "react-router-dom";
 
-import Home from "./components/Home";
 import Location from "./components/Location";
 import Forecast from "./components/Forecast";
 import Details from "./components/Details";
 import Header from "./components/Header";
 
 import background from "./images/background.jpg";
-import BarChart from "./components/BarChart";
 
 const GlobalStyle = createGlobalStyle`
 body {
@@ -19,8 +17,6 @@ padding: 0;
 }`;
 
 const PageWrapper = styled.div`
-  /* display: grid;
-  grid-template-columns: 1fr 1fr; */
   background-size: cover;
   flex-direction: column;
   display: flex;
@@ -44,14 +40,12 @@ class App extends React.Component {
                 <PageWrapper>
                   <Location
                     onSubmitLocation={city => {
-                      // pushing new path to browser router history where we can use it to serve another component
                       props.history.push({
                         pathname: "/forecast",
                         search: `?city=${city}`
                       });
                     }}
                   />
-                  <Home />
                 </PageWrapper>
               );
             }}

@@ -78,7 +78,7 @@ class Forecast extends React.Component {
             );
           })}
         </DaysContainer>
-        {/* <BarChart forecastData={this.state.forecastData} /> */}
+        <BarChart data={this.state.forecastData} />
       </React.Fragment>
     );
   }

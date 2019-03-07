@@ -1,74 +1,84 @@
-import React from "react";
+import React, { Component } from "react";
 import * as d3 from "d3";
-import { getDate, convertTemp } from "../utils/helpers";
-
-const width = 325;
-const height = 200;
+const width = 650;
+const height = 400;
 const margin = { top: 20, right: 5, bottom: 20, left: 35 };
 
-class BarChart extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      bars: []
-    };
-  }
+class BarChart extends Component {
+  state = {
+    bars: []
+  };
+
+  xAxis = d3.axisBottom().tickFormat(d3.timeFormat("%a %d"));
+  yAxis = d3.axisLeft().tickFormat(d => `${d}c`);
+
   static getDerivedStateFromProps(nextProps, prevState) {
-    const width = 325;
-    const height = 200;
     const { data } = nextProps;
-
     if (!data) return {};
-
-    // x axis using the dates
-    // get min/max of date
-    const timeDomain = d3.extent(data.list, d => new Date(d.dt * 1000));
+    const updatedData = data.list;
+    // 1. map date to x-position
+    // get min and max of date
+    const extent = d3.extent(updatedData, d => new Date(d.dt * 1000));
     const xScale = d3
       .scaleTime()
-      .domain(timeDomain)
-      .range([0, width]);
-    // y axis using the high temp
-    const tempMax = d3.max(data.list, d => d.temp.max);
-    const [minTempMax, maxTempMax] = d3.extent(data.list, d => d.temp.max);
+      .domain(extent)
+      .range([margin.left, width - margin.right]);
+
+    // 2. map high temp to y-position
+    // get min/max of high temp
+    const [min, max] = d3.extent(updatedData, d => d.temp.max);
     const yScale = d3
       .scaleLinear()
-      .domain([Math.min(minTempMax, 0), maxTempMax])
-      .range([height, 0]);
+      .domain([Math.min(min, 0), max])
+      .range([height - margin.bottom, margin.top]);
 
-    const colorExtent = d3.extent(data.list, d => d.temp.day);
+    // 3. map avg temp to color
+    // get min/max of avg
+    const colorExtent = d3
+      .extent(updatedData, d => (d.temp.max + d.temp.min) / 2)
+      .reverse();
     const colorScale = d3
       .scaleSequential()
       .domain(colorExtent)
       .interpolator(d3.interpolateRdYlBu);
 
-    const bars = data.list.map(d => {
-      const y1 = yScale(d.temp.max);
-      const y2 = yScale(d.temp.min);
+    // array of objects: x, y, height
+    const bars = updatedData.map(d => {
       return {
         x: xScale(new Date(d.dt * 1000)),
-        y: y1,
-        height: y2 - y1,
-        fill: colorScale(d.temp.day)
+        y: yScale(d.temp.max),
+        height: yScale(d.temp.min) - yScale(d.temp.max),
+        fill: colorScale((d.temp.max + d.temp.min) / 2),
+        date: new Date(d.dt * 1000)
       };
     });
-    return { bars };
+
+    return { bars, xScale, yScale };
   }
+
+  componentDidMount() {
+    this.xAxis.scale(this.state.xScale).tickValues(
+      this.state.bars.map(item => {
+        return item.date;
+      })
+    );
+    d3.select(this.refs.xAxis).call(this.xAxis);
+    this.yAxis.scale(this.state.yScale);
+    d3.select(this.refs.yAxis).call(this.yAxis);
+  }
+
   render() {
     return (
-      <div>
-        <svg width={width} height={height}>
-          {this.state.bars.map(d => {
-            return (
-              <rect
-                key={d.dt}
-                x={d.x}
-                y={d.y}
-                width={20}
-                height={d.height}
-                fill={d.fill}
-              />
-            );
-          })}
+      <div style={{ margin: "0 auto", display: "block", textAlign: "center" }}>
+        <h1>Weather Data for the week</h1>
+        <svg
+          width={670}
+          height={height}
+          style={{ margin: "5px", border: "solid 1px black", padding: "5px" }}
+        >
+          {this.state.bars.map(d => (
+            <rect x={d.x} y={d.y} width={2} height={d.height} fill={d.fill} />
+          ))}
           <g
             ref="xAxis"
             transform={`translate(0, ${height - margin.bottom})`}
